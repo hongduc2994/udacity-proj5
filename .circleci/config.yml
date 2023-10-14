@@ -13,11 +13,6 @@ commands:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip -qq awscliv2.zip
             sudo ./aws/install
-      - run:
-          name: Install eksctl
-          command: |
-            curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
-            tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 jobs:
   run-test:
     docker:
@@ -49,7 +44,7 @@ jobs:
   
   create_nodegroup:
     docker:
-      - image: cimg/base:2022.06
+      - image: circleci/aws-eks@2.2.0
     steps:
       - checkout
       - prepare-environment
