@@ -44,6 +44,7 @@ jobs:
           command: |
             cd app
             npm install
+            cd ..
             docker build -t hongduc2994/udacity-capstone:latest .
             docker push hongduc2994/udacity-capstone:latest
   
