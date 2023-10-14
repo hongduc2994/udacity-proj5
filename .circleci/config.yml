@@ -45,6 +45,7 @@ jobs:
             cd app
             npm install
             cd ..
+            docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
             docker build -t hongduc2994/udacity-capstone:latest .
             docker push hongduc2994/udacity-capstone:latest
   
@@ -76,6 +77,7 @@ jobs:
       - run:
           name: Deploy application
           command: |
+            docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
             aws eks update-kubeconfig --name capstone-cluster
             kubectl apply -f ./kube_config/deployment.yaml
             kubectl apply -f ./kube_config/service.yaml
