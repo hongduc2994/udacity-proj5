@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: react-app
+  name: react-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: react-app
+      version: v1.0.0
+  template:
+    metadata:
+      labels:
+        service: react-app
+        version: v1.0.0
+        api: external
+    spec:
+      containers:
+        - image: hongduc2994/udacityproj5:latest
+          name: react-app
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "150m"
+            limits:
+              memory: "2048Mi"
+              cpu: "300m"
+      restartPolicy: Always

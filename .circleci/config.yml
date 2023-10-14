@@ -1,0 +1,102 @@
+version: 2.1
+
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    # parameters:
+    #   # Add parameter here   
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+              aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID}" --recursive
+              aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
+              aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
+
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    # parameters:
+    #   # Add parameter here     
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          when: on_fail
+          command: |
+            echo "Reverting migration"
+            echo ${CIRCLE_WORKFLOW_ID}
+            SUCCESS=$(curl -s --insecure https://kvdb.io/B6hWBygMFp5hRNZM4in4ZS/migration_latest)
+            echo $SUCCESS
+            ## Logic for reverting the database state
+            if [ $SUCCESS == 1 ];
+              then
+                cd backend
+                npm install
+                npm run migrations:revert
+                echo "Ran migration:revert"
+            fi
+            
+jobs:
+  run-test:
+    docker:
+      - image: cimg/node:18.18.1
+    steps:
+      - checkout
+      - run:
+          name: Run unit test
+          command: |
+            # Your code here
+            cd app
+            npm install
+            npm run test
+
+  build-docker-image:
+    docker:
+      - image: cimg/base:2022.06
+    steps:
+      - checkout
+      - run:
+          name: Application build
+          command: |
+            docker build -t hongduc2994/udacity-capstone:latest .
+            docker push hongduc2994/udacity-capstone:latest
+  
+  create_nodegroup:
+    docker:
+      - image: cimg/base:2022.06
+    steps:
+      - checkout
+      - run:
+          name: Install eksctl
+          command: |
+            curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+            curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+            tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+            sudo mv /tmp/eksctl /usr/local/bin
+      - run:
+          name: Create nodegroup
+          command: |
+            aws eks update-kubeconfig --name capstone-cluster
+            eksctl create nodegroup --config-file=./kube_config/node_group.yaml
+
+    deploy_application:
+      docker:
+        - image: cimg/base:2022.06
+      steps:
+        - checkout
+        - run:
+            name: Deploy application
+            command: |
+              aws eks update-kubeconfig --name capstone-cluster
+              kubectl apply -f ./kube_config/deployment.yaml
+              kubectl apply -f ./kube_config/service.yaml
+
+workflows:
+  default:
+    jobs:
+      - run-test
+      - build-docker-image:
+          requires: [run-test]
+      - create_nodegroup:
+          requires: [build-docker-image]
