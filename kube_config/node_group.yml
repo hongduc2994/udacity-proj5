@@ -3,7 +3,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: capstone-cluster
+  name: capstone
   region: us-east-1
 
 managedNodeGroups:
@@ -13,3 +13,4 @@ managedNodeGroups:
     desiredCapacity: 1
     volumeSize: 80
     privateNetworking: false
+availabilityZones: ['us-east-1a', 'us-east-1b', 'us-east-1c', 'us-east-1d']

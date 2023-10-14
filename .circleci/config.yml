@@ -44,8 +44,8 @@ jobs:
             eksctl create nodegroup --config-file=./kube_config/node_group.yaml
 
   deploy_application:
-    docker:
-      - image: cimg/base:2022.06
+    machine:
+      image: ubuntu-2204:2022.04.2
     steps:
       - checkout
       - run:

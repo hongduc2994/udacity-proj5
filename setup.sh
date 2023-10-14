@@ -29,14 +29,12 @@ createcluster() {
     # check if cluster already exists (return something if the cluster exists, otherwise return nothing)
     local exists=$(aws eks describe-cluster \
         --name $PROJECT_NAME \
-        --region $AWS_REGION \
+        --region $AWS_REGION
         2>/dev/null)
         
     [[ -n "$exists" ]] && { error abort cluster $PROJECT_NAME already exists; return; }
 
-    eksctl create cluster \
-        --name $PROJECT_NAME \
-        --region $AWS_REGION
+    eksctl create cluster -f ./kube_config/node_groups.yml
 }
 
 deletecluster() {
