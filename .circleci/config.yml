@@ -1,5 +1,25 @@
 version: 2.1
-
+commands:
+  prepare-environment:
+    description: prepare env
+    # parameters:
+    #   # Add parameter here   
+    steps:
+      - run:
+          name: Install awscli
+          command: |
+            # Your code here
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -qq awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Install eksctl
+          command: |
+            curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+            curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+            tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+            sudo mv /tmp/eksctl /usr/local/bin
 jobs:
   run-test:
     docker:
@@ -15,8 +35,8 @@ jobs:
             npm run test
 
   build-docker-image:
-    docker:
-      - image: cimg/base:2022.06
+    machine:
+      image: ubuntu-2204:2022.04.2
     steps:
       - checkout
       - run:
@@ -30,13 +50,7 @@ jobs:
       - image: cimg/base:2022.06
     steps:
       - checkout
-      - run:
-          name: Install eksctl
-          command: |
-            curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
-            curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
-            tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
-            sudo mv /tmp/eksctl /usr/local/bin
+      - prepare-environment
       - run:
           name: Create nodegroup
           command: |
@@ -44,10 +58,18 @@ jobs:
             eksctl create nodegroup --config-file=./kube_config/node_group.yaml
 
   deploy_application:
-    machine:
-      image: ubuntu-2204:2022.04.2
+    docker:
+      - image: cimg/base:2022.06
     steps:
       - checkout
+      - prepare-environment
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+            echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
       - run:
           name: Deploy application
           command: |
