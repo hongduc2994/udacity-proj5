@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: capstone-BUILDID-np
   labels:
     service: react-app
   name: react-app
@@ -12,6 +13,7 @@ spec:
       version: v1.0.0
   template:
     metadata:
+      namespace: capstone-BUILDID-np
       labels:
         service: react-app
         version: v1.0.0

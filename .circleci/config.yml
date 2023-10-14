@@ -57,6 +57,7 @@ jobs:
           command: |
             aws eks update-kubeconfig --name capstone --region us-east-1
             cd kube_config
+            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID}/g" node_group.yml
             eksctl create nodegroup -f node_group.yml
 
   deploy_application:
@@ -75,8 +76,12 @@ jobs:
             docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
             aws eks update-kubeconfig --name capstone --region us-east-1
             cd kube_config
+            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID}/g" namespace.yml
+            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID}/g" deployment.yml
+            kubectl apply -f namespace.yml
             kubectl apply -f deployment.yml
-            kubectl apply -f service.yml
+            kubectl expose -f deployment.yml --type=LoadBalancer --name=react-app-public --port=9000
+            kubectl get deploy,rs,svc,pods
 
 workflows:
   default:
