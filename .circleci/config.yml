@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Create nodegroup
           command: |
-            aws eks update-kubeconfig --name capstone-cluster
+            aws eks update-kubeconfig --name capstone-cluster --region us-east-1
             eksctl create nodegroup --config-file=./kube_config/node_group.yaml
 
   deploy_application:
@@ -67,7 +67,7 @@ jobs:
           name: Deploy application
           command: |
             docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
-            aws eks update-kubeconfig --name capstone-cluster
+            aws eks update-kubeconfig --name capstone-cluster --region us-east-1
             kubectl apply -f ./kube_config/deployment.yaml
             kubectl apply -f ./kube_config/service.yaml
 
