@@ -74,8 +74,9 @@ jobs:
           command: |
             docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
             aws eks update-kubeconfig --name capstone --region us-east-1
-            kubectl apply -f ./kube_config/deployment.yaml
-            kubectl apply -f ./kube_config/service.yaml
+            cd kube_config
+            kubectl apply -f deployment.yml
+            kubectl apply -f service.yml
 
 workflows:
   default:
@@ -85,3 +86,5 @@ workflows:
           requires: [run-test]
       - create_nodegroup:
           requires: [build-docker-image]
+      - deploy_application:
+          requires: [create_nodegroup]
