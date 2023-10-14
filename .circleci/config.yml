@@ -56,7 +56,7 @@ jobs:
           name: Create nodegroup
           command: |
             aws eks update-kubeconfig --name capstone --region us-east-1
-            eksctl create nodegroup --config-file=./kube_config/node_group.yaml
+            eksctl create nodegroup -f ./kube_config/node_group.yaml
 
   deploy_application:
     docker:
