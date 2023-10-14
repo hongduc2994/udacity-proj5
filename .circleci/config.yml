@@ -50,6 +50,7 @@ jobs:
       - image: cimg/base:2022.06
     steps:
       - checkout
+      - prepare-environment
       - run:
           name: Create nodegroup
           command: |
