@@ -34,7 +34,7 @@ createcluster() {
         
     [[ -n "$exists" ]] && { error abort cluster $PROJECT_NAME already exists; return; }
 
-    eksctl create cluster -f ./kube_config/node_groups.yml
+    eksctl create cluster -f ./kube_config/node_group.yml
 }
 
 deletecluster() {

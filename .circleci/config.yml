@@ -18,6 +18,14 @@ commands:
           name: Install eksctl
           command: curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && sudo mv /tmp/eksctl /usr/local/bin
 jobs:
+  run_docker_lint:
+    docker:
+      - image: cimg/python:3.11.6
+    steps:
+        - run:
+            wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
+            chmod +x ./hadolint
+            hadolint Dockerfile
   run-test:
     docker:
       - image: cimg/node:18.18.1
@@ -29,6 +37,7 @@ jobs:
             # Your code here
             cd app
             npm install
+            npm run lint
             npm run test
 
   build-docker-image:
@@ -57,7 +66,7 @@ jobs:
           command: |
             aws eks update-kubeconfig --name capstone --region us-east-1
             cd kube_config
-            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID}/g" node_group.yml
+            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID:0:7}/g" node_group.yml
             eksctl create nodegroup -f node_group.yml
 
   deploy_application:
@@ -76,9 +85,11 @@ jobs:
             docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
             aws eks update-kubeconfig --name capstone --region us-east-1
             cd kube_config
+            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID:0:7}/g" namespace.yml
+            sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID:0:7}/g" deployment.yml
             kubectl apply -f deployment.yml
-            kubectl expose -f deployment.yml --type=LoadBalancer --name=react-app-public --port=9000
-            kubectl get deploy,rs,svc,pods
+            kubectl expose -f deployment.yml --namespace=capstone-${CIRCLE_WORKFLOW_ID:0:7}-ns --type=LoadBalancer --name=react-app-public --port=9000
+            kubectl get deploy,rs,svc,pods --namespace=capstone-${CIRCLE_WORKFLOW_ID:0:7}-ns
 
 workflows:
   default:
