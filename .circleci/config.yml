@@ -87,6 +87,7 @@ jobs:
             cd kube_config
             sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID:0:7}/g" namespace.yml
             sed -i "s/BUILDID/${CIRCLE_WORKFLOW_ID:0:7}/g" deployment.yml
+            kubectl apply -f namespace.yml
             kubectl apply -f deployment.yml
             kubectl expose -f deployment.yml --namespace=capstone-${CIRCLE_WORKFLOW_ID:0:7}-ns --type=LoadBalancer --name=react-app-public --port=9000
             kubectl get deploy,rs,svc,pods --namespace=capstone-${CIRCLE_WORKFLOW_ID:0:7}-ns
