@@ -20,7 +20,7 @@ spec:
         api: external
     spec:
       containers:
-        - image: hongduc2994/udacityproj5:v1
+        - image: hongduc2994/udacity-capstone:latest
           name: react-app
           imagePullPolicy: Always
           ports:
