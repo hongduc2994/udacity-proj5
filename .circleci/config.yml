@@ -95,6 +95,7 @@ jobs:
 workflows:
   default:
     jobs:
+      - run_docker_lint
       - run-test
       - build-docker-image:
           requires: [run-test]
