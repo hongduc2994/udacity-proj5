@@ -52,8 +52,8 @@ jobs:
             npm install
             cd ..
             docker login -u $DOCKERHUB_LOGIN  -p $DOCKERHUB_PASSWORD
-            docker build -t hongduc2994/udacity-capstone:latest .
-            docker push hongduc2994/udacity-capstone:latest
+            docker build -t hongduc2994/udacity-capstone:v1 .
+            docker push hongduc2994/udacity-capstone:v1
   
   create_nodegroup:
     docker:
