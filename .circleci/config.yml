@@ -25,9 +25,9 @@ jobs:
         - run:
             name: Run docker lint
             command: |
-              wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
-              sudo chmod +x /bin/hadolint
-              sudo /bin/hadolint Dockerfile
+              wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
+              sudo chmod +x ./hadolint
+              ./hadolint Dockerfile
   run-test:
     docker:
       - image: cimg/node:18.18.1
