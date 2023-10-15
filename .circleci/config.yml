@@ -24,7 +24,6 @@ jobs:
     steps:
         - run:
             wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
-            chmod +x ./hadolint
             hadolint Dockerfile
   run-test:
     docker:
@@ -100,6 +99,6 @@ workflows:
       - build-docker-image:
           requires: [run-test]
       - create_nodegroup:
-          requires: [build-docker-image]
+          requires: [build-docker-image, run_docker_lint]
       - deploy_application:
           requires: [create_nodegroup]
