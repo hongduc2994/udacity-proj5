@@ -27,7 +27,7 @@ jobs:
             command: |
               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
               sudo chmod +x /bin/hadolint
-              sudo hadolint Dockerfile
+              sudo /bin/hadolint Dockerfile
   run-test:
     docker:
       - image: cimg/node:18.18.1
