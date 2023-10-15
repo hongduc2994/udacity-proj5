@@ -26,7 +26,8 @@ jobs:
             name: Run docker lint
             command: |
               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
-              chmod +x /bin/hadolint
+              pwd
+              mv /bin/hadolint ~/react-app/hadolint
               sudo hadolint Dockerfile
   run-test:
     docker:
